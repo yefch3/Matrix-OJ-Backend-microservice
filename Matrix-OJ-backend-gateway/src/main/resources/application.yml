@@ -1,0 +1,55 @@
+spring:
+  application:
+    name: Matrix-OJ-backend-gateway
+  main:
+    web-application-type: reactive
+
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+      routes:
+        - id: Matrix-OJ-backend-service-user
+          uri: lb://matrix-oj-backend-service-user
+          predicates:
+            - Path=/api/user/**
+        - id: Matrix-OJ-backend-service-problem
+          uri: lb://matrix-oj-backend-service-problem
+          predicates:
+            - Path=/api/problem/**
+        - id: Matrix-OJ-backend-service-judge
+          uri: lb://matrix-oj-backend-service-judge
+          predicates:
+              - Path=/api/judge/**
+
+server:
+  address: localhost
+  port: 8101
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    preferIpAddress: true
+
+#knife4j:
+#  gateway:
+#    enabled: true
+#    strategy: discover
+#    discover:
+#      enabled: true
+#      version: swagger2
+
+knife4j:
+  gateway:
+    enabled: true
+    strategy: manual
+    routes:
+      - name: Matrix-OJ-backend-service-user
+        url: /api/user/doc.html
+      - name: Matrix-OJ-backend-service-problem
+        url: /api/problem/doc.html
+      - name: Matrix-OJ-backend-service-judge
+        url: /api/judge/doc.html
