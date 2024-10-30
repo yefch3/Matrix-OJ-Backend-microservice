@@ -2,7 +2,7 @@ package fangchen.oj.backend_service_judge.controller.inner;
 
 import fangchen.oj.backend_service_client.service.JudgeFeignClient;
 import fangchen.oj.backend_service_judge.judge.JudgeService;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -16,7 +16,7 @@ public class JudgeInnerController implements JudgeFeignClient {
     private JudgeService judgeService;
 
     @Override
-    @GetMapping("/do")
+    @PostMapping("/do")
     public void doJudge(long problemSubmitId) {
         judgeService.doJudge(problemSubmitId);
     }

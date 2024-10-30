@@ -28,7 +28,7 @@ spring:
   # todo 需替换配置，然后取消注释
   redis:
     database: 1
-    host: localhost
+    host: 3.128.50.111
     port: 6379
     timeout: 5000
     password: 123456
@@ -52,6 +52,7 @@ server:
     session:
       cookie:
         max-age: 2592000
+        path: /api
 mybatis-plus:
   configuration:
     map-underscore-to-camel-case: false

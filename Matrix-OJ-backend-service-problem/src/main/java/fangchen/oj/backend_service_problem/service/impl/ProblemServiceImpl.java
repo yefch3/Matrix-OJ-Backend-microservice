@@ -19,10 +19,12 @@ import fangchen.oj.backend_service_problem.service.ProblemService;
 import fangchen.oj.backend_common.utils.SqlUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -38,6 +40,9 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
 
     @Resource
     private UserFeignClient userFeignClient;
+
+    @Resource
+    private RedisTemplate<String, Problem> redisTemplate;
 
 //    @Resource
 //    private ProblemThumbMapper problemThumbMapper;
@@ -224,6 +229,19 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
 //        page.setRecords(resourceList);
 //        return page;
 //    }
+
+    @Override
+    public Problem getProblemById(Long problemId) {
+        String cacheKey = "problem:" + problemId;
+        Problem problem = redisTemplate.opsForValue().get(cacheKey);
+        if (problem == null) {
+            problem = getById(problemId);
+            if (problem != null) {
+                redisTemplate.opsForValue().set(cacheKey, problem, Duration.ofMinutes(10));
+            }
+        }
+        return problem;
+    }
 
     @Override
     public ProblemVO getProblemVO(Problem problem, HttpServletRequest request) {

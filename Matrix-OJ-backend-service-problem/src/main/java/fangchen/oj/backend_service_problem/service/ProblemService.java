@@ -21,6 +21,9 @@ public interface ProblemService extends IService<Problem> {
      */
     void validProblem(Problem problem, boolean add);
 
+
+    Problem getProblemById(Long problemId);
+
     /**
      * 获取查询条件
      *

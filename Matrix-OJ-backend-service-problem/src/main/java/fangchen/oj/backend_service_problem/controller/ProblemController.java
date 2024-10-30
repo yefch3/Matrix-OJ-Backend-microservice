@@ -89,7 +89,7 @@ public class ProblemController {
         User user = userFeignClient.getLoginUser(request);
         long id = deleteRequest.getId();
         // 判断是否存在
-        Problem oldProblem = problemService.getById(id);
+        Problem oldProblem = problemService.getProblemById(id);
         ThrowUtils.throwIf(oldProblem == null, ErrorCode.NOT_FOUND_ERROR);
         // 仅本人或管理员可删除
         if (!oldProblem.getUserId().equals(user.getId()) && !userFeignClient.isAdmin(user)) {
@@ -127,7 +127,7 @@ public class ProblemController {
         problemService.validProblem(problem, false);
         long id = problemUpdateRequest.getId();
         // 判断是否存在
-        Problem oldProblem = problemService.getById(id);
+        Problem oldProblem = problemService.getProblemById(id);
         ThrowUtils.throwIf(oldProblem == null, ErrorCode.NOT_FOUND_ERROR);
         boolean result = problemService.updateById(problem);
         return ResultUtils.success(result);
@@ -143,7 +143,7 @@ public class ProblemController {
         if (id <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        Problem problem = problemService.getById(id);
+        Problem problem = problemService.getProblemById(id);
         if (problem == null) {
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
         }
@@ -164,7 +164,7 @@ public class ProblemController {
         if (id <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        Problem problem = problemService.getById(id);
+        Problem problem = problemService.getProblemById(id);
         if (problem == null) {
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
         }
@@ -259,7 +259,7 @@ public class ProblemController {
         User loginUser = userFeignClient.getLoginUser(request);
         long id = problemEditRequest.getId();
         // 判断是否存在
-        Problem oldProblem = problemService.getById(id);
+        Problem oldProblem = problemService.getProblemById(id);
         ThrowUtils.throwIf(oldProblem == null, ErrorCode.NOT_FOUND_ERROR);
         // 仅本人或管理员可编辑
         if (!oldProblem.getUserId().equals(loginUser.getId()) && !userFeignClient.isAdmin(loginUser)) {

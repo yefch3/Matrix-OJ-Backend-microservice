@@ -12,6 +12,7 @@ public class RemoteCodeSandBox implements CodeSandBox {
         String url = "3.128.50.111:8080/execute";
         String json = JSONUtil.toJsonStr(executeCodeRequest);
         String result = HttpUtil.post(url, json);
+//        System.out.println("execute finished");
         return JSONUtil.toBean(result, ExecuteCodeResponse.class);
     }
 }

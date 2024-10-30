@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import fangchen.oj.backend_common.common.ErrorCode;
 import fangchen.oj.backend_common.constant.CommonConstant;
 import fangchen.oj.backend_common.exception.BusinessException;
-import fangchen.oj.backend_service_client.service.JudgeFeignClient;
 import fangchen.oj.backend_service_problem.mapper.ProblemSubmitMapper;
 import fangchen.oj.backend_model.model.dto.problemsubmit.ProblemSubmitAddRequest;
 import fangchen.oj.backend_model.model.dto.problemsubmit.ProblemSubmitQueryRequest;
@@ -16,13 +15,13 @@ import fangchen.oj.backend_model.model.entity.User;
 import fangchen.oj.backend_model.model.enums.ProblemSubmitLanguageEnum;
 import fangchen.oj.backend_model.model.enums.ProblemSubmitStatusEnum;
 import fangchen.oj.backend_model.model.vo.ProblemSubmitVO;
+import fangchen.oj.backend_service_problem.rabbitmq.MyMessageProducer;
 import fangchen.oj.backend_service_problem.service.ProblemSubmitService;
 import fangchen.oj.backend_service_problem.service.ProblemService;
 import fangchen.oj.backend_service_client.service.UserFeignClient;
 import fangchen.oj.backend_common.utils.SqlUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,9 +42,8 @@ public class ProblemSubmitServiceImpl extends ServiceImpl<ProblemSubmitMapper, P
     @Resource
     private UserFeignClient userFeignClient;
 
-    @Lazy
     @Resource
-    private JudgeFeignClient judgeFeignClient;
+    private MyMessageProducer myMessageProducer;
 
     /**
      * 题目提交
@@ -71,10 +69,6 @@ public class ProblemSubmitServiceImpl extends ServiceImpl<ProblemSubmitMapper, P
         long userId = loginUser.getId();
         // 每个用户串行提交题目
         // 锁必须要包裹住事务方法
-//        ProblemSubmitService problemSubmitService = (ProblemSubmitService) AopContext.currentProxy();
-//        synchronized (String.valueOf(userId).intern()) {
-//            return problemSubmitService.doProblemSubmitInner(userId, problemId);
-//        }
         ProblemSubmit problemSubmit = new ProblemSubmit();
         problemSubmit.setUserId(userId);
         problemSubmit.setProblemId(problemId);
@@ -88,10 +82,7 @@ public class ProblemSubmitServiceImpl extends ServiceImpl<ProblemSubmitMapper, P
         }
         // todo: judge
         Long problemSubmitId = problemSubmit.getId();
-//        CompletableFuture.runAsync(() -> {
-//            judgeFeignClient.doJudge(problemSubmitId);
-//        });
-        judgeFeignClient.doJudge(problemSubmitId);
+        myMessageProducer.sendMessage("code_exchange", "my_routingKey", String.valueOf(problemSubmitId));
         return problemSubmitId;
     }
 
